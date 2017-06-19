@@ -1,0 +1,23 @@
+{
+  "name": "IOTAccenture",
+  "version": "1.0.0",
+  "description": "**ACCOO**",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "cors": "*",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "mongoose": "*",
+    "passport": "*",
+    "passport-jwt": "*",
+    "zone.js": "^0.8.5"
+  },
+  "author": "ER, AI, SR, D",
+  "license": "ISC"
+}

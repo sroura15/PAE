@@ -1,0 +1,7 @@
+RESUM DE SERVICES
+
+Conversor.service: Inclou funcions per a canvis d'unitats.
+Tag.service: Inclou funcions de connexió amb la database referents als tags.
+User.service: Inclou funcions de connexió amb la database referents als users.
+Map.service: Inclou funcions de connexió amb la database referents als maps.
+

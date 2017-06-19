@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <base href="/" />
+    <title>Accoo - Accurate Indoor Solutions</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+    <!-- bootstrap css <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" /> -->
+    
+
+    <!-- application css -->
+    
+    <link href="assets/css/main.css" rel="stylesheet" />
+
+    <!-- polyfill(s) < for older browsers -->
+    <script src="node_modules/core-js/client/shim.min.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+
+    <script src="systemjs.config.js"></script>
+
+    
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        System.import('app').catch(function (err) { console.error(err); });
+    </script>
+    <style type="text/css">
+
+    @keyframes loading {
+            100% {transform: rotate(360deg);}
+    }
+    @keyframes bounce  {
+            0%, 100% {transform: scale(0.0);}
+            50% {transform: scale(1.0);}
+    }
+      
+    .load .spinner {animation: loading 2s linear infinite;}
+    .load .bubble-1, .load .bubble-2 {animation: bounce 2s ease-in-out infinite;}
+    .load .bubble-2 {animation-delay: -1.5s;}
+    .bubble-1,
+    .bubble-2 {
+        width: 1.2em;
+        height: 1.2em;
+        border-radius: 100%;
+        background-color: #f56a6a;
+    }
+    .load-wrapp {
+        width: 50px;
+        height: 50px;
+        margin: auto auto;
+        padding: 7em;
+        text-align: center;
+    }
+    .hi{
+        text-align: center;
+        margin: auto auto;
+        padding: auto;
+    }
+    .wellcome{
+        width: 20%;
+    }
+    </style>
+</head>
+<body>
+    <app>
+    <div class="hi"><br><br><br><br><img class="wellcome" src="images/accoo_logo.png"><br><br>
+        <div>Loading...</div>
+    </div>
+    <div class="load-wrapp">
+
+            <div class="load">
+                <div class="spinner">
+                    <div class="bubble-1"></div>
+                    <div class="bubble-2"></div>
+                 </div>
+            </div>
+        </div>
+     </app>
+</body>
+</html>

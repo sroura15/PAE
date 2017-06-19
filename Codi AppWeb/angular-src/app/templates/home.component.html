@@ -1,0 +1,253 @@
+
+<!-- Wrapper -->
+<div id="wrapper"> 
+
+    <!-- PLANTILLA PETICIÓ REFERÈNCIA -->
+    <div *ngIf="(newRefInserted)" id="ref_advise" style="position:fixed; z-index: 200; height: 5%; width: 100%; color: white;"> 
+            <div id="op_container" style="background:rgba(249,224,53,0.95); padding-top: 1em; padding-bottom: 1.6em; width: 100%">
+            <div style="margin: auto auto auto auto; padding-left: 4em;">
+            
+            <span style="color: black;margin-right: 1em">Asign now the requered values before continue:</span>
+            <input #refId style="top:0px;margin-top:1em ;margin-right: 0.5em;height: 1.6em;width: 6.5em" id="ide" type="" name="Identifier" placeholder="#Identifier" required>
+            <input #refHeight style="top:0px;margin-right: 1em;height: 1.6em;width: 4em" id="height" type="number" name="Height" step="0.01" min="0.01" placeholder="Height" required>
+           
+            <button type="submit" (click)="saveRefParams(refId.value,refHeight.value)" style="" class="button special small">Save</button>
+            <img (click)="newRefInserted=false" src="images/delete_minib.png" style="position: absolute;margin-right: 4em ;margin-top: 0.8em;right: 0em;height: 2em;cursor: pointer;">
+            <div style="color: red">{{alertMessage}}</div>
+            
+            
+                </div>
+            </div>
+        </div>
+
+    <!--  ALERTA CODE POP-UP   -->  
+    <div *ngIf="(someoneInRArea||editTagsView)" id="restringed_advise" style="position:fixed; z-index: 300; width: 30%; right: 1em; bottom: 3em;">
+    <div id="op_container" style="background:rgba(249,224,53,0.85);box-shadow: 2px 2px 3px rgba(0,0,0,0.55);border-radius: 5px;font-size: 0.9em; color: black; font-style: italic; padding-top: 0.8em; padding-bottom: 0.8em;">
+            <div style=" padding-left: 1em;">
+                <div class="sub-list" *ngFor="let tag of tags" style="position: relative; top:50%; left:2em">
+                <div *ngIf="tag.tagIn" style="position:relative;width: 80%" ><img src="images/warning-icon.png" style="position: relative;height: 1em;left: -1em">TAG {{tag.tagname}} is inside a restricted area!</div>
+    </div>
+            <div *ngIf="editTagsView" style="position: relative; left:2em;width: 80%"><img src="images/warning-icon.png" style="position: relative;height: 1em;left: -1em;">Remember to save the TAGS changes</div>
+    </div></div></div>
+
+    <!-- Main -->
+    <div id="main">
+
+
+        <newmap  *ngIf="(newMapForm)"   (onCancel)="closeNewMapMenu()"></newmap>
+
+        <options *ngIf="(Scount==2)"    (onResponse)="sendScale($event)"
+                                        (onCancel)="cancelScale()"></options>
+
+
+
+
+        <div class="inner">
+            
+            
+
+            <!-- Header with Room Informations-->
+            <header id="header">
+                <a href="index.html" class="logo"><strong>{{actualMap.mapname}}</strong> Monitorization</a>
+
+                <ul class="icons">
+                    <li><p>Hi {{currentUser.firstName}}!</p></li>
+                    <li><p><a [routerLink]="['/login']">Logout</a></p></li>
+                </ul>
+            </header>
+
+            <!-- Main Map View -->
+            <section id="map_holder">
+
+               <div id="image_map" style="width: 100%;height: 100%px;position: relative;"> 
+
+                <div size id="tags_view" style="position: absolute; width: 100%;height: 100%;">
+                    <canvas #myCanvas width="3840" height="2160" style= "width: 100%; height: 100%; border:1px solid black"></canvas>
+                </div>
+
+                <div id="data_map" (click)="getCursorPosition($event)" style="cursor:crosshair; background-color: yellow;position: absolute;opacity:0.2; width: 100%;height: 100%;" ></div>
+                <img id="map_view" src="images/C3_3_gran.png" title="Map" style="width:100%;height:100%;"> 
+            </div>
+
+
+
+
+        </section>
+
+    </div>
+</div>
+
+
+
+<!-- Sidebar MENU-->
+<div id="sidebar" [ngStyle]="{'margin-left': ocultarBarra(barraOculta)}">
+<img class="button-desplega" src="images/menu.png" (click)="clicked()">
+    <div class="inner">
+
+
+        <!-- .............. Menu Principal ............ -->
+        <nav class="menu" id="main_menu">
+            <header class="major">
+                <h2>ACCOO</h2>
+            </header>
+            <ul>
+                <li><a>Stages</a>
+                        <ol class="dot">
+                            <li style="position:relative;"  >
+                                <div>
+                                    <div>{{actualMap.mapname}}</div>
+                                </div></li>
+
+                        </ol>
+                </li>
+                <li><a>Tags</a>
+                    <ol>
+                        <li class="sub-list" *ngFor="let tag of tags">
+                        <div style="position:relative;color: red;" *ngIf="tag.tagname==''||tag.tagname==undefined">{{tag.idTag}} (Unsaved)
+                        <img src="">
+                        
+                        <div style="position: absolute;font-size:0.7em ;right: 5px;top:0.2em;height:1.6em;">(X:{{this.conversorService.twoDecimals(tag.coorX)}} Y:{{this.conversorService.twoDecimals(tag.coorY)}})m</div>
+                        </div>
+
+                        <div style="position:relative;" *ngIf="tag.tagname">{{tag.tagname}}
+                        <img src="">
+                        
+                        <div style="position: absolute;font-size:0.7em ;right: 5px;top:0.2em;height:1.6em;">(X:{{this.conversorService.twoDecimals(tag.coorX)}} Y:{{this.conversorService.twoDecimals(tag.coorY)}})m</div></div></li>
+                    </ol>
+                </li>
+                <li><a>Layers</a>
+                    <div class="6u 12u$(small)">
+                        <input type="checkbox" [checked]="layTagEmploy" (change)="layTagEmploy = !layTagEmploy" name="layTagEmploy" value="" id="employers" style="padding-left: 3em;" >
+                        <label for="employers">Employers</label>
+                    </div>
+                    <div class="6u$ 12u$(small)">
+                        <input type="checkbox" [checked]="layTagBox" (change)="layTagBox = !layTagBox" name="theLayTagBox" id="objects" style="padding-left: 3em" >
+                        <label for="objects">Object Tags</label>
+                    </div>
+                    <div class="6u 12u$(small)">
+                        <input type="checkbox" [checked]="layRefs" (change)="layRefs = !layRefs" name="layrefs" id="therefs" style="padding-left: 3em">
+                        <label for="therefs">References</label>
+                    </div>
+                    <div class="6u$ 12u$(small)">
+                        <input type="checkbox" [checked]="layRestringed" (change)="layRestringed = !layRestringed" name="layrestringed" id="restringed" style="padding-left: 3em">
+                        <label for="restringed">Restricted Areas</label>
+                    </div>
+
+                </li>
+                <li><a href="#advanced_menu">Advanced</a></li>
+
+            </ul>
+        </nav>
+
+        <!-- ......... Menu advanced ........... -->
+
+
+        <nav class="menu" id="advanced_menu">
+            <header class="major">
+                <h2>Advanced Menu</h2>
+            </header>
+            <ul>
+                <li style="position:relative;"><a>Stages </a>
+                    <img (click)="openNewMapMenu()" id="del" src="images/add_mini.png" title="Add New Map" style="position: absolute;right: 5px;top:0.5em; width:1.6em;height:1.6em; cursor: pointer;">
+                    <ol class="dot">
+                            <li style="position:relative;"  >
+                                <div>
+                                    <div>{{actualMap.mapname}}</div>
+                                </div></li>
+
+                        </ol>
+                    </li>
+
+                    <!-- BUTTONS TO CONFIGURATE MY MAP -->
+                    <li><a>Actual Stage Config</a> 
+                        <span>
+                            <button (click)="mapScale($event)" title="Mark two points in your stage map to indicate the real distance between them" class="button fit" [ngStyle]="{'color': color(mapScaleActivated) }">Adjust Stage Scale</button>
+                            <button (click)="mapReferences($event)" title="Add a new Reference by 'click' in the stage map" class="button fit" [ngStyle]="{'color': color(mapReferencesActivated) }">+ Add Reference by Location</button>
+                            <button (click)="addRestringedArea($event)" title="Add a new Restricted Area with two 'clikcs' in the stage map" class="button fit" [ngStyle]="{'color': color(mapaddRestringedAreaActivated) }">+ Add Restricted Area</button>
+                        </span><span></span>
+                    </li>     
+
+
+                    <!-- REFERENCES LIST -->
+                    <li style="position: relative;"><a class=""><img src="images/menu_row.png" style="width:1.2em; height: 1.2em; padding-top: 0.4em;padding-left: 0.2em;padding-right: 0.2em;"> References</a>
+                        <img (click)="goToEditRefView()" id="edit" src="images/edit_mini.png" title="Edit References" style="position: absolute;right: 5px;top:0.8em; width:1.6em;height:1.6em; cursor: pointer;">
+                        <!-- <img (click)="goToEditRefView()" id="save" src="images/save_mini.png" title="Save References" style="position: absolute;right: 5px;top:0.8em; width:1.6em;height:1.6em; cursor: pointer;"> -->
+                        <ol class="dot">
+                            <li style="position:relative;" *ngFor="let reference of references" >
+                                <div id="delete" >
+                                    <div>Ref. </div>
+                                    <div *ngIf="!editRefView" style="position: absolute;right: 9.9em;font-size: 0.9em;top:0.2em;margin-left: 1em;height: 1.6em;width: 6.5em;" id="ide" name="Identifier">#{{reference.referencename}}</div>
+                                    <div *ngIf="!editRefView" style="position: absolute;right: 2.5em;top:0px;margin-left: 1em;height: 1.6em;width: 4em;" id="height" name="Height">{{reference.coorZ}}</div>
+                                    <input *ngIf="editRefView" [(ngModel)]="reference.referencename" (keyup.enter)="createAndUpdateRef(reference)" (blur)="createAndUpdateRef(reference)" style="position: absolute;right: 6.9em;top:0px;margin-left: 1em;height: 1.6em;width: 6.5em;" id="ide" type="" name="Identifier" placeholder="#Identifier">
+                                    <input *ngIf="editRefView" [(ngModel)]="reference.coorZ" (keyup.enter)="createAndUpdateRef(reference)" (blur)="createAndUpdateRef(reference)" style="position: absolute;right: 2.9em;top:0px;margin-left: 1em;height: 1.6em;width: 3.2em;" id="height" type="number" name="Height" step="0.01" placeholder="Height">
+                                    <img *ngIf="editRefView" (click)="deleteRef(reference)" id="del" src="images/delete_mini.png" title="Delete" style="position: absolute;right: 5px;top:0px; width:1.6em;height:1.6em;cursor: pointer;">
+                                    
+                                </div></li>
+
+                            </ol>
+                    </li>
+
+                    <!-- TAGS LIST -->
+                    <li style="position: relative;">
+                        <a><img src="images/menu_row.png" style="width: 1.2em; height: 1.2em; padding-top: 0.4em;padding-left: 0.2em;padding-right: 0.2em;"> TAGs</a>
+                        <img *ngIf="!editTagsView" (click)="goToEditTagsView()" id="editTagsView" src="images/edit_mini.png" title="Edit Tags" style="position: absolute;right: 5px;top:0.8em; width:1.6em;height:1.6em; cursor: pointer;"/>
+                        <img *ngIf="editTagsView" (click)="goToEditTagsView()" id="editTagsView" src="images/save_mini.png" title="Edit Tags" style="position: absolute;right: 5px;top:0.8em; width:1.6em;height:1.6em; cursor: pointer;"/>
+
+                        <ol class="dot">
+                            <li style="position:relative;" *ngFor="let tag of tags" >
+        
+                                <img *ngIf="editTagsView" (click)="modifyTagType(tag)" id="tagtype" src="images/{{tag.tipoTag}}_type.png" title="Edit Tags" style="position: absolute;left: 6em;top:0.2em;height:1.3em; cursor: pointer;"/>
+                                <img *ngIf="!editTagsView" id="tagtypefix" src="images/{{tag.tipoTag}}_type.png" title="Edit Tags" style="position: absolute;left: 6em;top:0.2em;height:1.3em;"/>
+
+                                <div id="delete" style="padding-bottom:0.7em">#{{tag.idTag}}</div>
+
+                                <input *ngIf="editTagsView" [(ngModel)]="tag.tagname" (keyup.enter)="createAndUpdateTag(tag)" (blur)="createAndUpdateTag(tag)" style="position: absolute;left: 6.9em;top:0px;margin-left: 1em;height: 1.6em;width: 7em;" id="name" type="" name="name" placeholder="Re-Name">
+                                
+                                <div *ngIf="!editTagsView&&(tag.tagname==''||tag.tagname==undefined)" style="position: absolute;left: 9.9em;font-size: 0.9em;color: red;top:0.2em;height: 1.6em;" id="tagname" name="Tag Name">(Unsaved)</div>
+                                <div *ngIf="!editTagsView&&(tag.tagname)" style="position: absolute;left: 9.9em;font-size: 0.9em;top:0.2em;height: 1.6em;" id="tagname" name="Tag Name">{{tag.tagname}}</div>
+
+                                <img *ngIf="editTagsView" (click)="deleteTag(tag)" id="deltag" src="images/delete_mini.png" title="Delete" style="position: absolute;right: 5px;top:0px; width:1.6em;height:1.6em;cursor: pointer;">
+                                <input style="position:absolute;" type="checkbox" [checked]="!tag.restricted" (change)="tag.restricted = !tag.restricted" (keyup.enter)="createAndUpdateTag(tag)" (blur)="createAndUpdateTag(tag)" id="{{tag.idTag}}">
+                                <label style="left: 12em; font-size: 0.7em;top:-1em;padding-left: 3em" for="{{tag.idTag}}">Restricted</label>
+                                
+
+                                </li>
+                        </ol>
+                    </li>
+
+                    <!-- Restricted AREAS LIST  -->   
+                    <li style="position: relative;">
+                        <a><img src="images/menu_row.png" style="width: 1.2em; height: 1.2em; padding-top: 0.4em;padding-left: 0.2em;padding-right: 0.2em;"> Restricted Areas</a>
+                        <img (click)="goToEditRestringedView()" id="editRestringedView" src="images/edit_mini.png" title="Edit Restricted Areas" style="position: absolute;right: 5px;top:0.8em; width:1.6em;height:1.6em; cursor: pointer;">
+                        
+                        <ol class="dot">
+                            <li style="position:relative;" *ngFor="let rArea of rAreas" >
+                                <div id="deleteArea" >
+                                    <!-- <div>Ref. </div> -->
+                                    <div *ngIf="!editRestringedView" style="position: absolute;top:0.2em;height: 1.6emfont-size: 0.9em;" name="NameArea">{{rArea.areaname}}</div>
+                                    
+                                    <input *ngIf="editRestringedView" [(ngModel)]="rArea.areaname" (keyup.enter)="createAndUpdateRArea(rArea)" (blur)="createAndUpdateRArea(rArea)" style="position: absolute;top:0px;height: 1.6em;width: 9.5em;" type="" name="Area Name" placeholder="#Area">
+                                    
+                                    <img *ngIf="editRestringedView" (click)="deleteRArea(rArea)" src="images/delete_mini.png" title="Delete" style="position: absolute;right: 5px;top:0px; width:1.6em;height:1.6em;cursor: pointer;">
+                                    
+                                </div></li>
+
+                        </ol>
+                    </li>
+
+
+                            </ul>
+                        </nav>
+
+                        <!-- Footer of the Menu -->
+                        <footer id="footer">
+                          <p class="copyright">&copy; Accoo. All rights reserved.</p>
+                          <span class="image" style=""><img style="position: relative;
+                            margin: 0 auto; text-align: center; width: 90%;height: 90%;" src="images/accoo_logo.png"  /></span>
+                        </footer>
+
+                    </div>
+                </div>
+
+</div>
+

@@ -1,0 +1,98 @@
+import { Input, Component, OnInit, ViewChild, ElementRef} from '@angular/core';
+
+import { User, Tag } from '../objects/index';
+import { UserService, TagService, ConversorService } from '../services/index';
+import { OptionsComponent } from './index';
+
+//import { MapHolder } from '../modules/map.module';
+
+// Cargar fitxers
+import {FileUploadModule} from 'primeng/primeng'; 
+
+@Component({
+    selector:'canvas-component',
+    moduleId: module.id,
+    templateUrl: '../templates/home.component.html',
+   
+})
+
+export class HomeComponent implements OnInit {
+    currentUser: User;
+    users: User[] = [];
+    tags: Tag[];
+    mapHeight:number=50;
+    mapWidth:number=100;
+    tagRadW: number=20; // 20/3840
+    tagRadH:number=15;
+
+    canvas:HTMLElement;
+
+    @ViewChild('myCanvas') canvasRef:ElementRef;
+
+    constructor(private userService: UserService, private tagService: TagService, private conversorService: ConversorService) {
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.canvas = document.getElementById('map_view');
+       // this.canvasRef.nativeElement.
+    }
+
+  ngOnInit() {
+      this.loadAllUsers();
+      this.paintLoop();       
+  }
+
+    getTags(): void {
+        this.tagService.getTags().subscribe( tags =>{ this.tags = tags});
+    }
+
+  paintLoop=()=> {
+
+    // Paint current frame
+    this.getTags();
+    
+    if(this.tags!=null){
+    let ctx: CanvasRenderingContext2D=this.canvasRef.nativeElement.getContext('2d');
+   
+    ctx.clearRect(0,0,1000,1000);
+    ctx.beginPath();
+    ctx.fillStyle = '#DD0031';    
+        
+        for (let i=0 ; i < this.tags.length ; i++) {
+            let x = this.conversorService.xToPixels(this.tags[i].coorX, this.mapWidth);
+            let y = this.conversorService.yToPixels(this.tags[i].coorY, this.mapHeight);
+            ctx.moveTo(x, y);
+            ctx.ellipse(x, y, this.tagRadW, this.tagRadH, 0, 0, Math.PI * 2);
+        }
+    ctx.fill();
+    }
+
+    // Schedule next frame
+    requestAnimationFrame(this.paintLoop);
+  }
+
+   deleteUser(id: number) {
+       this.userService.delete(id).subscribe(() => { this.loadAllUsers() });
+   }
+
+   private loadAllUsers() {
+           this.userService.getAll().subscribe(users => { this.users = users; });
+   }
+
+    //GET CURSOR POSITION *IN PIXELS* ON MAP
+    public getCursorPosition(event:MouseEvent) {
+    //var rect = this.canvas.getBoundingClientRect();
+    var x = event.offsetX; 
+    var y = event.offsetY;  
+
+    var sizePix = 0;//this.canvas.offsetWidth;
+    var sizePiy = event.layerY;
+
+    console.log("x: " + x + " y: " + y +'   pictX: '+sizePix+" pictY:" +sizePiy);
+
+    }
+
+    public mapRecibers(event:Event){}
+
+    public mapLimits(event:Event){}
+
+    public mapScale(event:Event){}
+}

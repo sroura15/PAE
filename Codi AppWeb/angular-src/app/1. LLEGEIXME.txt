@@ -1,0 +1,21 @@
+Distribució d'elements per carpetes ("home" és el component principal):
+
+./components: inclou home.component, login.component, register.component i alert.component. (funcions relacionades amb la vista)
+./guards: inclou auth.guard.
+./modules: inclou map.module (actualment en desus)
+./objects: inclou user, tag, coordenades, map i referencies.
+./services: inclou alert.service, authentication.service, user.service, tag.service i conversor.service (funcions internes i connexió amb database)
+./templates: inclou els html. (vistes)
+
+INSTRUCCIONS PER AFEGIR NOUS ELEMENTS
+
+Al afegir un nou document en una de les carpetes afegiu l'export al fitxer "index" que hi ha dins d'ella.
+(Excepció: carpeta "templates")
+
+Els imports es criden del fitxer "index" de la carpeta on es trobi el component.
+
+Exemple: import {"HomeComponent"} from "../components/index";
+
+Afegir imports a app.module.
+
+En cas de voler afegir rutes, afegir dins de app.routing.
